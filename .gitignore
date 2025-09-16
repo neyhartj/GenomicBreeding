@@ -1,5 +1,6 @@
 .Rproj.user
 .Rhistory
 .RData
-sandbox.R
 inst/doc
+R/old
+data-raw/*.vcf

@@ -1,14 +1,14 @@
-Package: gws
-Title: What the Package Does (one line, title case)
-Version: 0.0.0.9000
+Package: GenomicBreeding
+Title: Tools for genomics-assisted breeding in plants
+Version: 0.0.1
 Authors@R: person("First", "Last", email = "first.last@example.com", role = c("aut", "cre"))
-Description: What the package does (one paragraph).
+Description: Functionality for genomics-assisted breeding in plants, including marker manipulation, genomewide prediction, and cross-validation.
 Depends:
     R (>= 3.3.1)
 License: What license is it under?
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.1
 Suggests: knitr,
     rmarkdown
 VignetteBuilder: knitr
