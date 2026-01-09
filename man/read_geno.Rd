@@ -25,7 +25,7 @@ individual/clone column is the id and haplotype, concatenated by \code{sep}.}
 
 \item{sep}{The haplotype concatenator; see \code{phased}.}
 
-\item{inbred}{Logical. If unphased marker data is passed, should the function assume that all genotypes are inbred?}
+\item{all.hom}{Logical. If unphased marker data is passed, should the function assume that all individuals are completely homozygous?}
 }
 \value{
 Variable of class \code{\link{geno}}.
@@ -55,5 +55,13 @@ geno_in <- read_geno(geno = cranberry_geno)
 
 # Read in cranberry phased haplotypes from Beagle
 geno_in <- read_geno(geno = cranberry_geno_phased, phased = TRUE, sep = "_hap")
+
+# Simulated polyploidy data
+geno <- replicate(1000, rbinom(n = 100, size = 4, prob = runif(1)))
+geno <- t(geno)
+colnames(geno) <- paste0("id", 1:100)
+meta <- data.frame(marker = paste0("m", 1:1000), chrom = 1, cM = seq(0, 100, length.out = 1000))
+geno <- cbind(meta, geno)
+geno_in <- read_geno(geno = geno, ploidy = 4)
 
 }

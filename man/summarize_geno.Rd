@@ -2,12 +2,12 @@
 % Please edit documentation in R/class_summaries.R, R/methods.R
 \name{summarize_geno}
 \alias{summarize_geno}
-\alias{plot,geno.summary-method}
+\alias{plot,geno.summary,ANY-method}
 \title{Summarize a \code{geno} object (and derived objects)}
 \usage{
 summarize_geno(geno)
 
-\S4method{plot}{geno.summary}(x)
+\S4method{plot}{geno.summary,ANY}(x)
 }
 \arguments{
 \item{geno}{A \code{geno} object (or its derivatives).}
@@ -17,6 +17,6 @@ Summarize a \code{geno} object (and derived objects)
 }
 \section{Functions}{
 \itemize{
-\item \code{plot(geno.summary)}: 
+\item \code{plot(x = geno.summary, y = ANY)}: 
 
 }}

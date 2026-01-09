@@ -13,7 +13,8 @@ filter_geno(
 )
 }
 \arguments{
-\item{geno}{A object of \class{geno} (i.e. output of function \code{\link{read_geno}}).}
+\item{geno}{A data.frame of genotype calls, where the first three columns are "marker," "chrom,", and "position."
+Subsequent columns are genotype calls for individuals.}
 
 \item{max.ind.miss}{The maximum rate of missingness to retain an individual}
 
@@ -31,12 +32,11 @@ Filter SNP marker genotypes
 }
 \examples{
 # Use data from the PopVar package
-data("barley_geno", package = "PopVar")
 data("cranberry_geno", package = "PopVar")
-data("cranberry_geno_phased", package = "PopVar")
 
-# Read in marker genotype data
-geno_in <- read_geno(geno = barley_geno)
+# Remove cM, rename
+geno <- cranberry_geno[-3]
+names(geno)[1:3] <- c("marker", "chrom", "position")
 
 # Filter
 geno_in <- filter_geno

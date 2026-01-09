@@ -21,6 +21,10 @@ S4 class of marker genotype data with linkage disequilibrium information
 
 \item{\code{phased}}{Whether the marker data was phased.}
 
+\item{\code{idx}}{The indices of individuals retained after filtering.}
+
+\item{\code{idy}}{The indices of markers retained after filtering.}
+
 \item{\code{LD}}{A matrix of pairwise marker LD estimates}
 }}
 

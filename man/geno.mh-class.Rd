@@ -23,6 +23,10 @@ S4 class of microhaplotype genotype data
 
 \item{\code{phased}}{Whether the marker data was phased.}
 
+\item{\code{idx}}{The indices of individuals retained after filtering.}
+
+\item{\code{idy}}{The indices of markers retained after filtering.}
+
 \item{\code{ploidy}}{The ploidy level.}
 
 \item{\code{map}}{A data frame of the genetic map information.}
@@ -32,5 +36,9 @@ S4 class of microhaplotype genotype data
 \item{\code{haplo.mat}}{A matrix of haplotypes.}
 
 \item{\code{phased}}{Whether the marker data was phased.}
+
+\item{\code{idx}}{The indices of individuals retained after filtering.}
+
+\item{\code{idy}}{The indices of markers retained after filtering.}
 }}
 

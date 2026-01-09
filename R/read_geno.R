@@ -6,7 +6,7 @@
 #' @param phased If TRUE, the input genotype matrix is phased, with alleles coded as positive integers. The name of each
 #' individual/clone column is the id and haplotype, concatenated by \code{sep}.
 #' @param sep The haplotype concatenator; see \code{phased}.
-#' @param inbred Logical. If unphased marker data is passed, should the function assume that all genotypes are inbred?
+#' @param all.hom Logical. If unphased marker data is passed, should the function assume that all individuals are completely homozygous?
 #'
 #' @details
 #' The first columns of the file or geno object should be marker, chrom, cM (and optionally bp, if provided). Subsequent columns
