@@ -7,7 +7,7 @@
 \usage{
 compare_geno(geno, thresh = 0.95)
 
-group_duplicates(dups)
+group_duplicates(x)
 }
 \arguments{
 \item{geno}{A data.frame of genotype calls, where the first three columns are "marker," "chrom,", and "position."
@@ -16,7 +16,7 @@ case you want to set a different threshold without running the marker comparison
 
 \item{thresh}{The threshold minimum proportion of matching marker genotypes to return pairs of individuals}
 
-\item{dups}{The output of \code{compare_geno}.}
+\item{x}{The output of \code{compare_geno}.}
 }
 \value{
 \itemize{
@@ -31,6 +31,8 @@ pairs of individuals with similarity above a threshold.
 \examples{
 geno <- replicate(3000, rbinom(200, 2, 0.5))
 dimnames(geno) <- list(paste0("gen", seq_len(nrow(geno))), paste0("marker", seq_len(ncol(geno))))
+geno <- t(geno)
+geno <- cbind(marker = row.names(geno), chrom = "1", position = round(seq(1, 50e6, length.out = nrow(geno))), as.data.frame(geno))
 
 out <- compare_geno(geno, thresh = 0.4)
 

@@ -19,6 +19,8 @@
 #' @examples
 #' geno <- replicate(3000, rbinom(200, 2, 0.5))
 #' dimnames(geno) <- list(paste0("gen", seq_len(nrow(geno))), paste0("marker", seq_len(ncol(geno))))
+#' geno <- t(geno)
+#' geno <- cbind(marker = row.names(geno), chrom = "1", position = round(seq(1, 50e6, length.out = nrow(geno))), as.data.frame(geno))
 #'
 #' out <- compare_geno(geno, thresh = 0.4)
 #'
@@ -58,24 +60,30 @@ compare_geno <- function(geno, thresh = 0.95) {
                      pMatching = z[above_thresh], row.names = NULL)
   row.names(above_thresh) <- NULL
 
-  # add the matching proportion and threshold to the dups output
-  attr(dups, "pairwise.comparison") <- z
-  attr(dups, "threshold") <- thresh
-  attr(dups, "above.threshold") <- above_thresh
-  class(dups) <- c(class(dups), "geno.comparison")
+  # Create an output list
+  out <- list(
+    duplicates = dups,
+    pairwise.comparison = z,
+    threshold = thresh,
+    above.threshold = above_thresh
+  )
 
-  return(dups)
+  class(out) <- c(class(out), "geno.comparison")
+
+  return(out)
 
 }
 
 #'
-#' @param dups The output of \code{compare_geno}.
+#' @param x The output of \code{compare_geno}.
 #'
 #' @rdname compare_geno
 #'
 #' @export
 #'
-group_duplicates <- function(dups) {
+group_duplicates <- function(x) {
+  stopifnot(inherits(x, "geno.comparison"))
+  dups <- x$duplicates
   # Get unique ids
   ids <- unique(dups$geno1)
   grouped_ids <- setNames(rep(0, length(ids)), ids)

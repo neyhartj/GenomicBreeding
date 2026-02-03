@@ -182,6 +182,8 @@ infer_haplotypes_polyorigin <- function(geno, ped, out.prefix, ploidy = 2, filte
 #' @param pedfile Path to the _pedfile.csv output from polyorigin haplotype reconstruction
 #' @param ploidy The ploidy level
 #'
+#' @export
+#'
 #'
 polyorigin_to_rqtl2 <- function(genofile, pedfile, ploidy = 2) {
 

@@ -2,6 +2,6 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 compare_geno_cpp <- function(data) {
-    .Call('_GenomicBreeding_compare_geno_cpp', PACKAGE = 'GenomicBreeding', data)
+    .Call(`_GenomicBreeding_compare_geno_cpp`, data)
 }
 

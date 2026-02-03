@@ -4,10 +4,24 @@
 \alias{merge_vcfs}
 \title{Merge VCF files together}
 \usage{
-merge_vcfs(vcf.list)
+merge_vcfs(
+  vcf.list,
+  run.ids = NULL,
+  sep = ".",
+  run.id.append = c("all", "only.duplicated", "none")
+)
 }
 \arguments{
 \item{vcf.list}{A list of \code{vcfR} objects.}
+
+\item{run.ids}{A vector of characters defining the run ID for each \code{vcfR} object in \code{vcf.list}.
+This ID will be added as a suffix in repeated sample ID in case they exist in different files.}
+
+\item{sep}{The string to separate sample names from the suffix in order to make samples unique.}
+
+\item{run.id.append}{When should run.ids be appended? If "all", all samples will have a run.id appeneded; if
+"only.duplicated", only duplicated samples will have a run.id appeneded; if "none", run.ids will not be used to
+make sample names unique.}
 }
 \value{
 A \code{vcfR} object with merged variant data.

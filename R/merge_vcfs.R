@@ -1,6 +1,12 @@
 #' Merge VCF files together
 #'
 #' @param vcf.list A list of \code{vcfR} objects.
+#' @param run.ids A vector of characters defining the run ID for each \code{vcfR} object in \code{vcf.list}.
+#' This ID will be added as a suffix in repeated sample ID in case they exist in different files.
+#' @param sep The string to separate sample names from the suffix in order to make samples unique.
+#' @param run.id.append When should run.ids be appended? If "all", all samples will have a run.id appeneded; if
+#' "only.duplicated", only duplicated samples will have a run.id appeneded; if "none", run.ids will not be used to
+#' make sample names unique.
 #'
 #' @return A \code{vcfR} object with merged variant data.
 #'
@@ -9,9 +15,19 @@
 #' @export
 #'
 #'
-merge_vcfs <- function(vcf.list) {
+merge_vcfs <- function(vcf.list, run.ids = NULL, sep = ".", run.id.append = c("all", "only.duplicated", "none")) {
 
+  stopifnot(is.list(vcf.list))
   stopifnot(all(sapply(vcf.list, inherits, "vcfR")))
+  stopifnot(is.character(sep))
+  run.id.append <- match.arg(run.id.append)
+
+  if (!is.null(run.ids)) {
+    stopifnot(is.character(run.ids))
+    stopifnot(length(run.ids) == length(vcf.list))
+  } else {
+    run.ids <- replicate(length(vcf.list), expr = NULL, simplify = FALSE)
+  }
 
   complements = c("A" = "T", "C" = "G", "T" = "A", "G" = "C")
 
@@ -30,11 +46,28 @@ merge_vcfs <- function(vcf.list) {
       sample_idy_list[[i]] <- max(sample_idy_list[[i-1]]) + seq_along(sample_names_list[[i]])
     }
   }
-  sample_names <- unlist(sample_names_list)
+
+  # Make samples unique
+  if (run.id.append == "none") {
+    sample_names_uniq <- make.unique(names = unlist(sample_names_list), sep = sep)
+  } else if (run.id.append == "all") {
+    sample_names_uniq <- mapply(sample_names_list, run.ids, FUN = function(x, y) cbind(x, y))
+    sample_names_uniq <- do.call(rbind, sample_names_uniq)
+    sample_names_uniq <- apply(X = sample_names_uniq, MARGIN = 1, FUN = paste0, collapse = sep)
+  } else {
+    dup_samples <- table(unlist(sample_names_list))
+    dup_samples <- names(dup_samples[dup_samples > 1])
+    sample_names_list1 <- mapply(sample_names_list, run.ids, FUN = function(x, y) {
+      x[x %in% dup_samples] <- paste0(x[x %in% dup_samples], sep, y)
+      x
+    })
+    sample_names_uniq <- unlist(sample_names_list1)
+  }
+
 
   # Create an empty GT matrix
-  gt <- matrix(as.character(NA), nrow = length(marker_names), ncol = length(sample_names),
-               dimnames = list(marker_names, sample_names))
+  gt <- matrix(as.character(NA), nrow = length(marker_names), ncol = length(sample_names_uniq),
+               dimnames = list(marker_names, sample_names_uniq))
 
   # Iterate over each vcf
   for (i in seq_along(vcf.list)) {
@@ -116,7 +149,7 @@ merge_vcfs <- function(vcf.list) {
   fix_all2$FILTER <- as.character(NA)
 
   gt1 <- gt[fix_all2$ID, , drop = FALSE]
-  colnames(gt1) <- make.unique(colnames(gt1))
+  # colnames(gt1) <- make.unique(colnames(gt1))
 
   # Recalculate summary statistics
   AD <- apply(X = gt1, MARGIN = 1, FUN = function(x) sapply(strsplit(x = x, split = ":"), "[[", 2))
