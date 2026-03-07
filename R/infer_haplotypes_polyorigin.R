@@ -12,7 +12,6 @@
 #' @param julia.path The path to the Julia executable on the system.
 #'
 #' @importFrom mappoly read_geno_csv filter_missing
-#' @import PolyOriginR
 #'
 #' @export
 #'
