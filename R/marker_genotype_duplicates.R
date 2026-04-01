@@ -34,6 +34,7 @@
 #' @export
 #'
 compare_geno <- function(geno, thresh = 0.95) {
+
   stopifnot(inherits(geno, c("data.frame", "geno.comparison")))
   stopifnot(thresh >= 0 & thresh <= 1)
 
@@ -145,7 +146,7 @@ drop_duplicates <- function(geno, alias, keep = c("assigned", "lowest.missing"))
 
   # First find entries in alias that have a one-to-one consensus genotype (i.e. nothing to merge)
   idx_singletons <- which(sapply(alias_split, nrow) == 1)
-  alias_singletons <- names(alias_split[idx_singletons])
+  alias_singletons <- sapply(X = alias_split[idx_singletons], FUN = "[[", 1)
   idx_singletons <- which(row.names(geno) %in% alias_singletons)
   # Set these aside as well
   geno_singletons <- geno[idx_singletons, , drop = FALSE]

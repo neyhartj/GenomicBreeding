@@ -87,7 +87,7 @@ merge_vcfs <- function(vcf.list, run.ids = NULL, sep = ".", run.id.append = c("a
   fix_list <- lapply(X = vcf.list, FUN = getFIX, getINFO = TRUE)
   fix_all <- NULL
   for (i in seq_along(fix_list)) {
-    fix <- fix_list[i]
+    fix <- fix_list[[i]]
     if (i == 1) {
       fix_all <- as.data.frame(fix)[,c("CHROM", "POS", "ID", "REF", "ALT")]
       names(fix_all)[4:5] <- c("REF.1", "ALT.1")
