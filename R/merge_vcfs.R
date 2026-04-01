@@ -10,7 +10,7 @@
 #'
 #' @return A \code{vcfR} object with merged variant data.
 #'
-#' @import vcfR
+#' @importFrom vcfR masplit
 #'
 #' @export
 #'

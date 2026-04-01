@@ -10,7 +10,7 @@
 #' @param minQ The minimum site quality score to retain a site.
 #' @param remove.completely.missing Logical. Should completely missing genotypes be removed?
 #'
-#' @import vcfR
+#' @importFrom vcfR getFIX extract.gt
 #' @importFrom polyBreedR ADsplit
 #'
 #' @export
