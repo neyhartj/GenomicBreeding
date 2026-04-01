@@ -51,7 +51,7 @@ merge_vcfs <- function(vcf.list, run.ids = NULL, sep = ".", run.id.append = c("a
   if (run.id.append == "none") {
     sample_names_uniq <- make.unique(names = unlist(sample_names_list), sep = sep)
   } else if (run.id.append == "all") {
-    sample_names_uniq <- mapply(sample_names_list, run.ids, FUN = function(x, y) cbind(x, y))
+    sample_names_uniq <- mapply(sample_names_list, run.ids, FUN = function(x, y) cbind(x, y), SIMPLIFY = FALSE)
     sample_names_uniq <- do.call(rbind, sample_names_uniq)
     sample_names_uniq <- apply(X = sample_names_uniq, MARGIN = 1, FUN = paste0, collapse = sep)
   } else {
@@ -169,6 +169,7 @@ merge_vcfs <- function(vcf.list, run.ids = NULL, sep = ".", run.id.append = c("a
     x1 <- x[,c("ID", "INFO")]
     info_split <- strsplit(x = x[,"INFO"], split = ";")
     target <- sapply(X = info_split, grep, pattern = "TYPE", value = TRUE)
+    target <- sapply(X = target, FUN = function(x) ifelse(length(x) > 0, x, "TYPE=offtarget"))
     cbind(ID = x1[,"ID"], INFO = target)
   })
   target_mat <- do.call(rbind, fix_target_list)

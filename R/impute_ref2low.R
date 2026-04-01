@@ -98,9 +98,9 @@ impute_ref2low <- function(in.file, out.file, ref.file, ped.file, ind.max.missin
   if (!dir.exists(tmp_dir)) dir.create(tmp_dir)
 
   # Convert the reference file to phased library file
-  library_files <- berryBreedR:::vcf2ag(vcf = vcf_ref, outdir = tmp_dir, sep.by.chrom = TRUE)
+  library_files <- vcf2ag(vcf = vcf_ref, outdir = tmp_dir, sep.by.chrom = TRUE)
   # convert the input VCF to alpha-genes genotype files
-  input_files <- berryBreedR:::vcf2ag(vcf = vcf_in, outdir = tmp_dir, sep.by.chrom = TRUE)
+  input_files <- vcf2ag(vcf = vcf_in, outdir = tmp_dir, sep.by.chrom = TRUE)
 
   # Iterate over chromosomes and run imputation
   chrnames <- unique(vcf_ref@fix[,"CHROM"])
