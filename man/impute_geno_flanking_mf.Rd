@@ -3,7 +3,6 @@
 \name{impute_geno_flanking_mf}
 \alias{impute_geno_flanking_mf}
 \alias{impute_geno_flanking}
-\alias{impute_geno_em}
 \title{Impute marker genotypes in families using flanking markers}
 \usage{
 impute_geno_flanking_mf(
@@ -24,8 +23,6 @@ impute_geno_flanking(
   map.function = c("haldane", "kosambi", "c-f", "morgan"),
   return.geno.prob = FALSE
 )
-
-impute_geno_em(x, method = c("EM", "mean"), verbose = TRUE)
 }
 \arguments{
 \item{x}{A \code{marker.matrix} object.}
@@ -45,10 +42,6 @@ impute_geno_em(x, method = c("EM", "mean"), verbose = TRUE)
 \item{offspring}{A n x m matrix of offspring marker genotypes.}
 
 \item{f.gen}{The filial (inbreeding) generation of offspring in the family (i.e. f.gen = 3 = F_3 offspring).}
-
-\item{method}{The imputation method; may be "EM" for expectation-maximization or "mean" for the marker mean.}
-
-\item{verbose}{Logical; should status messages be printed?}
 }
 \value{
 A list containing i) the new marker matrix with imputed marker genotypes and ii) the missingness statistics for pre-  and post-imputation.
@@ -61,7 +54,5 @@ Imputed marker genotypes for multiple families using flanking markers and recomb
 \section{Functions}{
 \itemize{
 \item \code{impute_geno_flanking()}: Impute marker genotypes in a single family using flanking markers
-
-\item \code{impute_geno_em()}: Impute marker genotypes using an expectation-maximization algorithm or the marker mean; implements this one chromosome at-a-time.
 
 }}

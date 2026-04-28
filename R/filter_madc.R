@@ -67,7 +67,15 @@ filter_madc <- function(madc, madc.file, min.mh.reads = 2, min.mh.samples = 10, 
 
   # Calculate the percent identity of the haplotype sequences to the reference
   seqs_by_locus <- lapply(X = madc_by_locus, function(x) setNames(x$AlleleSequence, x$AlleleID) )
-  perc_ident_seqs <- map(seqs_by_locus, ~{
+  # Remove any loci with 1 sequence
+  num_seqs_by_locus <- sapply(seqs_by_locus, length)
+  locus_one_seq <- which(num_seqs_by_locus < 2)
+  # Remove these
+  if (length(locus_one_seq) > 0) {
+    seqs_by_locus <- seqs_by_locus[-locus_one_seq]
+  }
+
+  perc_ident_seqs <- lapply(seqs_by_locus, function(.x) {
     ref_idx <- grep(pattern = "Ref_[0]{1,}1", x = names(.x))
     alt_idx <- grep(pattern = "Alt_[0]{1,}2", x = names(.x))
     match_idx <- grep(pattern = "Match", x = names(.x))
