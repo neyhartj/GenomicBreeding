@@ -55,7 +55,7 @@ filter_madc <- function(madc, madc.file, min.mh.reads = 2, min.mh.samples = 10, 
   row.names(madc_mat) <- madc$AlleleID
 
   # First create an index of the ref and alt haplotypes; these will always be retained
-  idx_refalt <- grep(pattern = "Ref_[0]{1,}1|Alt_[0]{1,}2", x = row.names(madc_mat), value = TRUE)
+  idx_refalt <- grep(pattern = "Ref_[0]{1,}1$|Alt_[0]{1,}2$", x = row.names(madc_mat), value = TRUE)
 
   # Compute the number of samples per haplotype that are above the read count
   hap_sample_read_ct <- rowSums(madc_mat >= min.mh.reads)
@@ -76,13 +76,15 @@ filter_madc <- function(madc, madc.file, min.mh.reads = 2, min.mh.samples = 10, 
   }
 
   perc_ident_seqs <- lapply(seqs_by_locus, function(.x) {
-    ref_idx <- grep(pattern = "Ref_[0]{1,}1", x = names(.x))
-    alt_idx <- grep(pattern = "Alt_[0]{1,}2", x = names(.x))
+  # perc_ident_seqs <- map(seqs_by_locus, ~{
+    ref_idx <- grep(pattern = "Ref_[0]{1,}1$", x = names(.x))
+    alt_idx <- grep(pattern = "Alt_[0]{1,}2$", x = names(.x))
     match_idx <- grep(pattern = "Match", x = names(.x))
     other_idx <- setdiff(seq_along(.x), c(ref_idx, alt_idx, match_idx))
     dist <- polyRAD:::.nucdist(alleles1 = .x[c(match_idx, other_idx)], alleles2 = .x[ref_idx])
     len_ref <- nchar(.x[ref_idx])
     perc_ident <- 1 - (dist / len_ref)
+    # print(names(.x))
     # Return
     matrix(c(1, 1, perc_ident), ncol = 1, dimnames = list(names(.x)[c(ref_idx, alt_idx, match_idx, other_idx)], "perc_ident"))
   })
