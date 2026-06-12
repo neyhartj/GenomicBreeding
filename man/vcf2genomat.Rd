@@ -4,12 +4,14 @@
 \alias{vcf2genomat}
 \title{Convert a VCF object to a geno object}
 \usage{
-vcf2genomat(vcf.in, ploidy = 2, n.core = 1)
+vcf2genomat(vcf.in, ploidy = 2, n.core = 1, diploidize = FALSE)
 }
 \arguments{
 \item{ploidy}{The ploidy level.}
 
 \item{n.core}{The number of computer cores to use.}
+
+\item{diploidize}{Logical. Should genotypes from higher ploidy levels be converted to diploid form?}
 
 \item{x}{A \code{vcfR} object.}
 }

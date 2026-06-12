@@ -62,7 +62,7 @@ calc_LD_r2 <- function(geno, r2.df = NULL, by.chrom = TRUE, max.pair = 100000, x
 
       # Compute the correlations
       if (method == "full") {
-        r2_ld_j <- cor(x = geno_mat_j, use = "pairwise.complete.obs")^2
+        r2_ld_j2 <- cor(x = geno_mat_j, use = "pairwise.complete.obs")^2
 
       } else {
         # Fill in missing data with the mean

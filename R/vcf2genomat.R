@@ -3,23 +3,25 @@
 #' @param x A \code{vcfR} object.
 #' @param ploidy The ploidy level.
 #' @param n.core The number of computer cores to use.
+#' @param diploidize Logical. Should genotypes from higher ploidy levels be converted to diploid form?
 #'
 #' @importFrom vcfR extract.gt
 #' @importFrom polyBreedR GT2DS
 #'
 #' @export
 #'
-vcf2genomat <- function(vcf.in, ploidy = 2, n.core = 1) {
+vcf2genomat <- function(vcf.in, ploidy = 2, n.core = 1, diploidize = FALSE) {
   stopifnot(inherits(vcf.in, "vcfR"))
   stopifnot(ploidy %in% c(2, 4, 6))
   stopifnot(n.core >= 1)
+  stopifnot(is.logical(diploidize))
 
   # Get GT and dosage
   gt <- extract.gt(x = vcf.in, element = "GT")
   # Detect and correct phasing
   gt <- sub("\\|", replacement = "/", x = gt)
 
-  dos <- GT2DS(GT = gt, n.core = n.core)
+  dos <- GT2DS(GT = gt, n.core = n.core, diploidize = diploidize)
   # add map information
   map_info <- as.data.frame(vcf.in@fix[,c("ID", "CHROM", "POS")])
   names(map_info) <- c("marker", "chrom", "position")
