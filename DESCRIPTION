@@ -8,7 +8,6 @@ Depends:
 License: What license is it under?
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.3.3
 Suggests: knitr,
     rmarkdown
 VignetteBuilder: knitr
@@ -16,3 +15,4 @@ LinkingTo:
     Rcpp
 Imports: 
     Rcpp
+Config/roxygen2/version: 8.0.0

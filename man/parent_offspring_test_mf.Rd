@@ -31,8 +31,6 @@ parent_offspring_test(
 
 \item{correct}{Logical: should marker genotypes be corrected? Correction only happens when possible.}
 
-\item{mismatch.tol}{}
-
 \item{parents}{A 2 x m matrix of parent marker genotypes.}
 
 \item{offspring}{A n x m matrix of offspring marker genotypes.}

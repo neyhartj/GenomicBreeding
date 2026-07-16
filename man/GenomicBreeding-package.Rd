@@ -11,5 +11,10 @@ Functionality for genomics-assisted breeding in plants, including marker manipul
 \author{
 \strong{Maintainer}: First Last \email{first.last@example.com}
 
+Authors:
+\itemize{
+  \item First Last \email{first.last@example.com}
+}
+
 }
 \keyword{internal}
