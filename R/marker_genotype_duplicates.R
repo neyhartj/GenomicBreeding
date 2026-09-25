@@ -194,6 +194,139 @@ drop_duplicates <- function(geno, alias, keep = c("assigned", "lowest.missing"))
 
 
 
+#' Merge duplicates in a marker genotype matrix
+#'
+#' @param geno A data.frame of genotype calls, where the first three columns are "marker," "chrom,", and "position."
+#' Subsequent columns are genotype calls for individuals.
+#' @param alias A data frame where the first column is the original individual name
+#' and the second column is the new consensus individual name.
+#' @param snps.use The SNPs to be used to compare duplicates. Defaults to all markers.
+#' @param min.concordance The minimum percentage of concordance among non-missing genotype calls among
+#' duplicate samples in order to merge those samples. If the observed concordance is less than
+#' \code{min.concordance}, those samples will not be merged and a warning will be
+#' printed. Set this to a low number to ensure merging.
+#'
+#' @details
+#' Individuals not found in \code{alias} will be returned as is.
+#'
+#' @returns A marker genotype matrix where rows are individuals and columns are markers.
+#'
+#'
+#' @export
+#'
+merge_duplicates <- function(geno, alias, snps.use, run.ids = NULL, min.concordance = 0.90) {
+
+  stopifnot(is.data.frame(geno))
+  cols.match <- names(geno)[1:3] == c("marker", "chrom", "position")
+  if (any(!cols.match)) {
+    stop("The first 3 columns of 'geno' should be 'marker', 'chrom', and 'position'.")
+  }
+  stopifnot(is.data.frame(alias))
+  if (min.concordance < 0 | min.concordance > 1) stop("'min.concordance' must be between 0 and 1.")
+  min.concordance <- as.numeric(min.concordance)
+
+  mars <- geno$marker
+
+  if (missing(snps.use)) {
+    snps.use <- mars
+  } else {
+    if (!all(snps.use %in% mars)) stop("Not all markers in 'snps.use' are in the input vcf.")
+  }
+
+  # Convert the geno object to a matrix
+  geno_orig <- geno
+  geno <- rrblup2genomat(x = geno, transpose = FALSE)
+
+  # Get the names of samples
+  ind_names <- colnames(geno)
+  # Get the index of sample columns
+  ind_idx <- seq_along(ind_names)
+
+  # Make sure all ind_names are in alias[[1]]
+  if (!all(ind_names %in% alias[[1]])) stop("Not all samples names in 'vcf.in' are in the first column of 'alias'.")
+
+  # Split by consensus genotype
+  alias_split <- split(alias, alias[[2]])
+
+  # First find entries in alias that have a one-to-one consensus genotype (i.e. nothing to merge)
+  idx_singletons <- which(sapply(alias_split, nrow) == 1)
+  alias_singletons <- sapply(X = alias_split[idx_singletons], FUN = "[[", 1)
+  idx_singletons <- which(ind_names %in% alias_singletons)
+
+  # Subset geno_orig for the non-duplicated samples
+  geno_orig_singleton <- geno_orig[,c("marker", "chrom", "position", alias_singletons)]
+
+  # For non-singletons, merge individuals
+  idx_duplicates <- which(sapply(alias_split, nrow) > 1)
+  alias_split_duplicates <- alias_split[idx_duplicates]
+  duplicate_keep <- vector("character", length(alias_split_duplicates))
+  geno_dup_consensus <- NULL
+
+  for (i in seq_along(alias_split_duplicates)) {
+    dat <- alias_split_duplicates[[i]]
+
+    # Pull genotype data for these samples; use only target markers
+    # geno_dup <- geno[snps.use, dat$sample_id]
+    geno_dup <- geno_orig[,c("marker", "chrom", "position", dat$sample_id)]
+    geno_dup <- geno_dup[geno_dup$marker %in% snps.use, ]
+    # Compute concordance
+    geno_comp <- compare_geno(geno = geno_dup, thresh = 0)
+
+    # If any samples have pairwise concordances less than the minimum, drop them
+    while (any(geno_comp$duplicates$pMatching < min.concordance) & nrow(geno_comp$pairwise.comparison) > 2) {
+      # Aggregate pMatching by sample
+      pmatch_agg <- aggregate(pMatching ~ geno1, data = geno_comp$duplicates, FUN = mean)
+      # Drop the lowest and retest
+      samp_keep <- pmatch_agg$geno1[setdiff(seq_along(pmatch_agg$geno1), which.min(x = pmatch_agg$pMatching))]
+      geno_comp <- compare_geno(geno = geno_dup[, c("marker", "chrom", "position", samp_keep)], thresh = 0)
+    }
+
+    # If the remaining samples are still not concordant and there are only two samples, choose the sample
+    # with lower missing data
+    if (any(geno_comp$duplicates$pMatching < min.concordance) & nrow(geno_comp$pairwise.comparison) <= 2) {
+      samp_keep <- names(which.min(colMeans(is.na(geno_dup[, row.names(geno_comp$pairwise.comparison)]))))
+    } else {
+      samp_keep <- row.names(geno_comp$pairwise.comparison)
+    }
+
+    # Merge the remaining samples; the dropped sample will remain dropped
+
+    geno_dup1 <- geno_orig[,samp_keep, drop = FALSE]
+    # Order columns from left to right in decreasing missing data order
+    geno_dup1 <- geno_dup1[, order(colMeans(is.na(geno_dup1))), drop = FALSE]
+    # Coalesce
+    consensus_geno <- coalesce(!!!as.list(geno_dup1))
+    consensus_geno <- as.matrix(consensus_geno)
+    colnames(consensus_geno) <- dat$geno_id[1]
+
+    # Bind
+    geno_dup_consensus <- cbind(geno_dup_consensus, consensus_geno)
+
+  }
+
+  # Combine the singleton genotypes with the consensus genotypes
+  geno_full <- cbind(geno_orig_singleton, geno_dup_consensus)
+  # Get all sample names
+  ids <- colnames(geno_full)[-1:-3]
+  # Remove run ID
+  ids1 <- ids
+  if (!is.null(run.ids)) {
+    for (runid in run.ids) {
+      ids1 <- sub(pattern = paste0(".", runid), replacement = "", x = ids1)
+    }
+  }
+
+  colnames(geno_full)[-1:-3] <- ids1
+
+  # Print messages
+  cat("\nNumber of individuals in the original 'geno' object:", ncol(geno))
+  cat("\nNumber of duplicates removed:", ncol(geno) - ncol(geno_full) - 3)
+  cat("\nNumber of individuals in the output 'geno' object:",  ncol(geno_full) - 3)
+
+  # return
+  return(geno_full)
+
+}
 
 
 #' Reduce a marker matrix by duplicates
